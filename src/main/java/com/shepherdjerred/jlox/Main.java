@@ -10,7 +10,9 @@ import java.util.List;
 
 public class Main {
 
+  private static final Interpreter interpreter = new Interpreter();
   static boolean hadError = false;
+  static boolean hadRuntimeError = false;
 
   public static void main(String[] args) throws IOException {
     if (args.length > 1) {
@@ -30,6 +32,9 @@ public class Main {
     // Indicate an error in the exit code.
     if (hadError) {
       System.exit(65);
+    }
+    if (hadRuntimeError) {
+      System.exit(70);
     }
   }
 
@@ -56,7 +61,7 @@ public class Main {
       return;
     }
 
-    System.out.println(new SyntaxTreePrinter().print(expression));
+    interpreter.interpret(expression);
   }
 
   static void error(int line, String message) {
@@ -75,5 +80,10 @@ public class Main {
     } else {
       report(token.line, " at '" + token.lexeme + "'", message);
     }
+  }
+
+  static void runtimeError(InterpreterException error) {
+    System.err.println(error.getMessage() + "\n[line " + error.token.line + "]");
+    hadRuntimeError = true;
   }
 }

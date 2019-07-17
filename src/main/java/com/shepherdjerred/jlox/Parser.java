@@ -16,7 +16,7 @@ public class Parser {
   Expression parse() {
     try {
       return expression();
-    } catch (ParseError error) {
+    } catch (ParseException error) {
       return null;
     }
   }
@@ -152,9 +152,9 @@ public class Parser {
     return tokens.get(current - 1);
   }
 
-  private ParseError error(Token token, String message) {
+  private ParseException error(Token token, String message) {
     Main.error(token, message);
-    return new ParseError();
+    return new ParseException();
   }
 
   private void synchronize() {
