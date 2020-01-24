@@ -1,6 +1,25 @@
 package com.shepherdjerred.jlox;
 
-import static com.shepherdjerred.jlox.TokenType.*;
+import static com.shepherdjerred.jlox.TokenType.BANG;
+import static com.shepherdjerred.jlox.TokenType.BANG_EQUAL;
+import static com.shepherdjerred.jlox.TokenType.EOF;
+import static com.shepherdjerred.jlox.TokenType.EQUAL_EQUAL;
+import static com.shepherdjerred.jlox.TokenType.FALSE;
+import static com.shepherdjerred.jlox.TokenType.GREATER;
+import static com.shepherdjerred.jlox.TokenType.GREATER_EQUAL;
+import static com.shepherdjerred.jlox.TokenType.LEFT_PAREN;
+import static com.shepherdjerred.jlox.TokenType.LESS;
+import static com.shepherdjerred.jlox.TokenType.LESS_EQUAL;
+import static com.shepherdjerred.jlox.TokenType.MINUS;
+import static com.shepherdjerred.jlox.TokenType.NIL;
+import static com.shepherdjerred.jlox.TokenType.NUMBER;
+import static com.shepherdjerred.jlox.TokenType.PLUS;
+import static com.shepherdjerred.jlox.TokenType.RIGHT_PAREN;
+import static com.shepherdjerred.jlox.TokenType.SEMICOLON;
+import static com.shepherdjerred.jlox.TokenType.SLASH;
+import static com.shepherdjerred.jlox.TokenType.STAR;
+import static com.shepherdjerred.jlox.TokenType.STRING;
+import static com.shepherdjerred.jlox.TokenType.TRUE;
 
 import java.util.List;
 
@@ -13,7 +32,7 @@ public class Parser {
     this.tokens = tokens;
   }
 
-  Expression parse() {
+  Expr parse() {
     try {
       return expression();
     } catch (ParseException error) {
@@ -21,87 +40,87 @@ public class Parser {
     }
   }
 
-  private Expression expression() {
+  private Expr expression() {
     return equality();
   }
 
-  private Expression equality() {
-    Expression expr = comparison();
+  private Expr equality() {
+    Expr expr = comparison();
 
     while (match(BANG_EQUAL, EQUAL_EQUAL)) {
       Token operator = previous();
-      Expression right = comparison();
-      expr = new Expression.Binary(expr, operator, right);
+      Expr right = comparison();
+      expr = new Expr.Binary(expr, operator, right);
     }
 
     return expr;
   }
 
-  private Expression comparison() {
-    Expression expr = addition();
+  private Expr comparison() {
+    Expr expr = addition();
 
     while (match(GREATER, GREATER_EQUAL, LESS, LESS_EQUAL)) {
       Token operator = previous();
-      Expression right = addition();
-      expr = new Expression.Binary(expr, operator, right);
+      Expr right = addition();
+      expr = new Expr.Binary(expr, operator, right);
     }
 
     return expr;
   }
 
-  private Expression addition() {
-    Expression expr = multiplication();
+  private Expr addition() {
+    Expr expr = multiplication();
 
     while (match(MINUS, PLUS)) {
       Token operator = previous();
-      Expression right = multiplication();
-      expr = new Expression.Binary(expr, operator, right);
+      Expr right = multiplication();
+      expr = new Expr.Binary(expr, operator, right);
     }
 
     return expr;
   }
 
-  private Expression multiplication() {
-    Expression expr = unary();
+  private Expr multiplication() {
+    Expr expr = unary();
 
     while (match(SLASH, STAR)) {
       Token operator = previous();
-      Expression right = unary();
-      expr = new Expression.Binary(expr, operator, right);
+      Expr right = unary();
+      expr = new Expr.Binary(expr, operator, right);
     }
 
     return expr;
   }
 
-  private Expression unary() {
+  private Expr unary() {
     if (match(BANG, MINUS)) {
       Token operator = previous();
-      Expression right = unary();
-      return new Expression.Unary(operator, right);
+      Expr right = unary();
+      return new Expr.Unary(operator, right);
     }
 
     return primary();
   }
 
-  private Expression primary() {
+  private Expr primary() {
     if (match(FALSE)) {
-      return new Expression.Literal(false);
+      return new Expr.Literal(false);
     }
     if (match(TRUE)) {
-      return new Expression.Literal(true);
+      return new Expr.Literal(true);
     }
     if (match(NIL)) {
-      return new Expression.Literal(null);
+      return new Expr.Literal(null);
     }
 
     if (match(NUMBER, STRING)) {
-      return new Expression.Literal(previous().literal);
+      return new Expr.Literal(previous().literal);
     }
 
     if (match(LEFT_PAREN)) {
-      Expression expr = expression();
+      Expr expr = expression();
       consume(RIGHT_PAREN, "Expect ')' after expression.");
-      return new Expression.Grouping(expr);
+      return new Expr.Grouping(expr);
     }
 
     throw error(peek(), "Expect expression.");

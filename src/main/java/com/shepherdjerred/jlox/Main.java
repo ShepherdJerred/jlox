@@ -54,7 +54,7 @@ public class Main {
     List<Token> tokens = scanner.scanTokens();
 
     Parser parser = new Parser(tokens);
-    Expression expression = parser.parse();
+    Expr expression = parser.parse();
 
     // Stop if there was a syntax error.
     if (hadError) {

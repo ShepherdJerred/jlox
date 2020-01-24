@@ -1,35 +1,37 @@
 package com.shepherdjerred.jlox;
 
-public class SyntaxTreePrinter implements Expression.Visitor<String> {
+import com.shepherdjerred.jlox.Expr.Literal;
+
+public class SyntaxTreePrinter implements Expr.Visitor<String> {
 
   public static void main(String[] args) {
-    Expression expression = new Expression.Binary(
-        new Expression.Unary(
+    Expr expression = new Expr.Binary(
+        new Expr.Unary(
             new Token(TokenType.MINUS, "-", null, 1),
-            new Expression.Literal(123)),
+            new Expr.Literal(123)),
         new Token(TokenType.STAR, "*", null, 1),
-        new Expression.Grouping(
-            new Expression.Literal(45.67)));
+        new Expr.Grouping(
+            new Expr.Literal(45.67)));
 
     System.out.println(new SyntaxTreePrinter().print(expression));
   }
 
-  String print(Expression expr) {
+  String print(Expr expr) {
     return expr.accept(this);
   }
 
   @Override
-  public String visitBinaryExpression(Expression.Binary expression) {
+  public String visitBinaryExpr(Expr.Binary expression) {
     return parenthesize(expression.operator.lexeme, expression.left, expression.right);
   }
 
   @Override
-  public String visitGroupingExpression(Expression.Grouping expression) {
+  public String visitGroupingExpr(Expr.Grouping expression) {
     return parenthesize("group", expression.expression);
   }
 
   @Override
-  public String visitLiteralExpression(Expression.Literal expression) {
+  public String visitLiteralExpr(Literal expression) {
     if (expression.value == null) {
       return "nil";
     }
@@ -37,15 +39,15 @@ public class SyntaxTreePrinter implements Expression.Visitor<String> {
   }
 
   @Override
-  public String visitUnaryExpression(Expression.Unary expression) {
+  public String visitUnaryExpr(Expr.Unary expression) {
     return parenthesize(expression.operator.lexeme, expression.right);
   }
 
-  private String parenthesize(String name, Expression... expressions) {
+  private String parenthesize(String name, Expr... expressions) {
     StringBuilder builder = new StringBuilder();
 
     builder.append("(").append(name);
-    for (Expression expr : expressions) {
+    for (Expr expr : expressions) {
       builder.append(" ");
       builder.append(expr.accept(this));
     }

@@ -1,16 +1,16 @@
 package com.shepherdjerred.jlox;
 
-import com.shepherdjerred.jlox.Expression.Binary;
-import com.shepherdjerred.jlox.Expression.Grouping;
-import com.shepherdjerred.jlox.Expression.Literal;
-import com.shepherdjerred.jlox.Expression.Unary;
-import com.shepherdjerred.jlox.Expression.Visitor;
+import com.shepherdjerred.jlox.Expr.Binary;
+import com.shepherdjerred.jlox.Expr.Grouping;
+import com.shepherdjerred.jlox.Expr.Literal;
+import com.shepherdjerred.jlox.Expr.Unary;
+import com.shepherdjerred.jlox.Expr.Visitor;
 
 public class Interpreter implements Visitor<Object> {
 
-  void interpret(Expression expression) {
+  void interpret(Expr Expr) {
     try {
-      Object value = evaluate(expression);
+      Object value = evaluate(Expr);
       System.out.println(stringify(value));
     } catch (InterpreterException error) {
       Main.runtimeError(error);
@@ -18,7 +18,7 @@ public class Interpreter implements Visitor<Object> {
   }
 
   @Override
-  public Object visitBinaryExpression(Binary expression) {
+  public Object visitBinaryExpr(Binary expression) {
     Object left = evaluate(expression.left);
     Object right = evaluate(expression.right);
 
@@ -63,17 +63,17 @@ public class Interpreter implements Visitor<Object> {
   }
 
   @Override
-  public Object visitGroupingExpression(Grouping expression) {
+  public Object visitGroupingExpr(Grouping expression) {
     return evaluate(expression.expression);
   }
 
   @Override
-  public Object visitLiteralExpression(Literal expression) {
+  public Object visitLiteralExpr(Literal expression) {
     return expression.value;
   }
 
   @Override
-  public Object visitUnaryExpression(Unary expression) {
+  public Object visitUnaryExpr(Unary expression) {
     Object right = evaluate(expression.right);
 
     switch (expression.operator.type) {
@@ -142,7 +142,7 @@ public class Interpreter implements Visitor<Object> {
     return object.toString();
   }
 
-  private Object evaluate(Expression expression) {
+  private Object evaluate(Expr expression) {
     return expression.accept(this);
   }
 }
